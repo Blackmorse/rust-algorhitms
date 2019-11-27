@@ -19,6 +19,7 @@ struct Bubble {}
 struct Selection {}
 struct Insertion {}
 struct ShellSort {}
+struct InsertionWithoutExchangesSort {}
 
 impl SortAlgorhitm for Bubble  {
     fn sort(vec: &mut Vec<impl Ord>) {
@@ -88,14 +89,35 @@ impl SortAlgorhitm for ShellSort {
     }
 }
 
+impl SortAlgorhitm for InsertionWithoutExchangesSort {
+    fn sort(vec: &mut Vec<impl Ord>) {
+        let n = vec.len();
+
+        for i in 1..n {
+            let el = vec.get(i).unwrap();
+            let mut j = i;
+            while j > 0 && el < &vec[j - 1] {
+                j -= 1;
+            }
+
+             vec[j..=i].rotate_right(1);
+            //  vec.insert(j, el);
+        }
+    }
+}
+
 fn generate_vec(n: usize) -> Vec<i32> {
     let mut vec = Vec::new();
 
     let mut rng = rand::thread_rng();
 
-    for _ in 0..n {
+    for i in 0..n {
         let number: i32 = rng.gen();
         vec.push(number);
+
+        vec.push(n as i32 - i as i32)
+
+        // vec.push(10);
     }
 
     vec
@@ -111,7 +133,7 @@ fn check_sorted(vec: Vec<impl Ord>) -> bool {
 }
 
 fn main() {
-    let n: usize = 4000;
+    let n: usize = 1000;
     let t = 20;
 
     let mut t1: u128 = 0;
@@ -127,7 +149,7 @@ fn main() {
 
         let mut vec = generate_vec(n);
         let time = SystemTime::now();
-        ShellSort::sort(&mut vec);
+        InsertionWithoutExchangesSort::sort(&mut vec);
         let elaps = time.elapsed().unwrap().as_millis();
         check_sorted(vec);
         t2 += elaps;
@@ -189,6 +211,15 @@ mod tests {
         let mut vec = get_vec();
 
         ShellSort::sort(&mut vec);
+
+        check(vec);
+    }
+
+    #[test]
+    fn test_insertion_without_exchanges() {
+        let mut vec = get_vec();
+
+        InsertionWithoutExchangesSort::sort(&mut vec);
 
         check(vec);
     }
