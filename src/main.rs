@@ -20,6 +20,7 @@ struct Selection {}
 struct Insertion {}
 struct ShellSort {}
 struct InsertionWithoutExchangesSort {}
+struct InsertionWithSentinel {}
 
 impl SortAlgorhitm for Bubble  {
     fn sort(vec: &mut Vec<impl Ord>) {
@@ -106,6 +107,31 @@ impl SortAlgorhitm for InsertionWithoutExchangesSort {
     }
 }
 
+impl SortAlgorhitm for InsertionWithSentinel {
+    fn sort(vec: &mut Vec<impl Ord>) {
+        let n = vec.len();
+
+        let mut min_index = 0;
+        let mut min_value = &vec[0];
+
+        for i in 1..n {
+            if &vec[i] < min_value {
+                min_value = &vec[i];
+                min_index = i;
+            }
+        }
+        vec.swap(0, min_index);
+
+        for i in 1..n {
+            let mut j = i;
+            while vec[j] < vec[j - 1] {
+                vec.swap(j, j-1);
+                j = j - 1;
+            }
+        }
+    }
+}
+
 fn generate_vec(n: usize) -> Vec<i32> {
     let mut vec = Vec::new();
 
@@ -133,7 +159,7 @@ fn check_sorted(vec: Vec<impl Ord>) -> bool {
 }
 
 fn main() {
-    let n: usize = 1000;
+    let n: usize = 3000;
     let t = 20;
 
     let mut t1: u128 = 0;
@@ -142,14 +168,14 @@ fn main() {
     for _ in 0..t {
         let mut vec = generate_vec(n);
         let time = SystemTime::now();
-        Insertion::sort(&mut vec);
+        InsertionWithSentinel::sort(&mut vec);
         let elaps = time.elapsed().unwrap().as_millis();
         check_sorted(vec);
         t1 += elaps;
 
         let mut vec = generate_vec(n);
         let time = SystemTime::now();
-        InsertionWithoutExchangesSort::sort(&mut vec);
+        Insertion::sort(&mut vec);
         let elaps = time.elapsed().unwrap().as_millis();
         check_sorted(vec);
         t2 += elaps;
@@ -220,6 +246,15 @@ mod tests {
         let mut vec = get_vec();
 
         InsertionWithoutExchangesSort::sort(&mut vec);
+
+        check(vec);
+    }
+
+    #[test]
+    fn test_insertion_with_sentinel() {
+        let mut vec = get_vec();
+
+        InsertionWithSentinel::sort(&mut vec);
 
         check(vec);
     }
